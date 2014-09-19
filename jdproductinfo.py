@@ -1,9 +1,10 @@
 import urllib.request
 import re
+from bs4 import BeautifulSoup
 
 r_id = re.compile('[0-9]+')
 r_picre = re.compile('[0-9]+\.00')
-r_name = re.compile('name: \'.+\'')
+r_name = re.compile('name: \'(.+)\'')
 
 
 
@@ -29,13 +30,15 @@ def get_data(openurl):
 class jdproductinfo:
     def __init__(self,url=None):
         self.url = url
-        self.id = ''.join(r_id.findall(url))
+        self.id = r_id.findall(url)[0]
         self.pr_url = "http://p.3.cn/prices/get?skuid=J_"+self.id
         self.ur_url = "http://club.jd.com/review/"+self.id+"-0-1-0.html"
 
     def getname(self):
         data = get_data(self.url)
-        p_name = ''.join(r_name.findall(data.decode('gb2312')))
+#        p_name = r_name.findall(data.decode('gb2312'))[0]
+        soup = BeautifulSoup(data.decode('gb2312','ignore'))
+        p_name = soup.find('div',id='name').h1.get_text()
         return(p_name)
 
     def getprices(self,n='now'):
