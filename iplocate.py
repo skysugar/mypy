@@ -19,4 +19,4 @@ try:
         if data[i]:
             print(data[i],end=' ')
 except:
-    print('Taobao:API错误...',end='')
+    print('Taobao:API Errot ...',end='')
