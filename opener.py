@@ -13,7 +13,13 @@ def makebrowser():
     opener.addheaders = [('User-agent',UA)]
     return opener
 
-
+def fixUA(headers,referer):
+    rlst = []
+    for i,j in headers:
+        if i != 'referer':
+            rlst.append((i,j))
+    rlst.append(('referer',referer))
+    return rlst
 
 a = makebrowser()
 r = a.open('http://127.0.0.1/')
