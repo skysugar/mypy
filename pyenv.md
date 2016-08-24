@@ -14,7 +14,5 @@ curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-
 添加环境变量,一般操作家目录下.bash_profile
 
 export PATH="~/.pyenv/bin:$PATH"
-
 eval "$(pyenv init -)"
-
 eval "$(pyenv virtualenv-init -)"
