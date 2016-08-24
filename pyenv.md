@@ -2,7 +2,7 @@
 
 yum -y install git gcc make patch zlib-devel gdbm-devel openssl-devel sqlite-devel bzip2-devel readline-devel
 
-如果要安装到指定路面设置$PYENV_ROOT环境变量
+如果要安装到指定目录,需要设置$PYENV_ROOT环境变量
 
 PYENV_ROOT=/opt/pyenv
 
