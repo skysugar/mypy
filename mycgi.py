@@ -21,12 +21,13 @@ class mycgi:
             t = threading.Thread(target=self.handle_requst, args=(conn, addr))
             t.start()
 
-    def start_respone(self, *l):
+    def start_response(self, *l):
         code = '{}  {}\r\n'.format(self.environ['VERSION'], l[0])
         header = l[1]
         self.conn.send(code.encode('utf-8'))
         for i in header:
-            self.conn.send('{}:{}\r\n\r\n'.format(*i).encode('utf-8'))
+            self.conn.send('{}:{}\r\n'.format(*i).encode('utf-8'))
+        self.conn.send(b'\r\n')
 
     def handle_requst(self, conn, addr):
         self.conn = conn
@@ -36,7 +37,7 @@ class mycgi:
                 break
             self.environ = environ = self.make_env(data)
             environ['REMOTE_HOST'] = addr
-            reply = self.app(self.environ, self.start_respone)
+            reply = self.app(self.environ, self.start_response)
             conn.send(reply)
             conn.send(b'\r\n')
             conn.close()
@@ -64,9 +65,9 @@ class mycgi:
         self.sock.close()
 
 
-def hello(environ, start_respone):
+def hello(environ, start_response):
     print(environ)
-    start_respone("200 OK", [('Content-Type', 'text/html')])
+    start_response("200 OK", [('Content-Type', 'text/html')])
     #time.sleep(2)
     return b'hello cgi'
 
