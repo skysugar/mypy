@@ -24,7 +24,6 @@ class mycgi:
     def handle_request(self, conn, addr):
         while self.status:
             data = conn.recv(4096)
-            print(data)
             if not data: break
             environ = self.make_env(data)
             environ['REMOTE_HOST'] = addr
