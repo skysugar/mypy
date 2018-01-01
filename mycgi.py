@@ -29,15 +29,14 @@ class mycgi:
             environ['REMOTE_HOST'] = addr
 
             def start_response(*l):
-                code = '{}  {}\r\n'.format(environ['VERSION'], l[0])
+                http_header = '{}  {}\r\n'.format(environ['VERSION'], l[0])
                 header = l[1]
-                conn.send(code.encode('utf-8'))
                 for i in header:
-                    conn.send('{}:{}\r\n'.format(*i).encode('utf-8'))
-                conn.send(b'\r\n')
-            reply = self.app(environ, start_response)
+                    http_header += '{}:{}\r\n'.format(*i)
+                http_header += '\r\n'
+                conn.send(http_header.encode('utf-8'))
+            reply= self.app(environ, start_response)+ b'\r\n'
             conn.send(reply)
-            conn.send(b'\r\n')
             conn.close()
             break
 
