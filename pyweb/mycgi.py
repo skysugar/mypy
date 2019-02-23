@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 
+
 class mycgi:
     def __init__(self, host='', port=10000, app=None):
         if app == None:
@@ -17,26 +18,29 @@ class mycgi:
         while self.status:
             conn, addr = self.sock.accept()
             print('new access {}:{}'.format(*addr))
-            # self.handle_requst(conn,addr)
-            t = threading.Thread(target=self.handle_request, args=(conn, addr))
+            #self.handle_requst(conn,addr)
+            t = threading.Thread(target=self.handle_requst, args=(conn, addr))
             t.start()
 
-    def handle_request(self, conn, addr):
-        while self.status:
-            data = conn.recv(4096)
-            if not data: break
-            environ = self.make_env(data)
-            environ['REMOTE_HOST'] = addr
+    def start_response(self, *l):
+        code = '{}  {}\r\n'.format(self.environ['VERSION'], l[0])
+        header = l[1]
+        self.conn.send(code.encode('utf8'))
+        for i in header:
+            self.conn.send('{}:{}\r\n'.format(*i).encode('utf-8'))
+        self.conn.send(b'\r\n')
 
-            def start_response(*l):
-                http_header = '{}  {}\r\n'.format(environ['VERSION'], l[0])
-                header = l[1]
-                for i in header:
-                    http_header += '{}:{}\r\n'.format(*i)
-                http_header += '\r\n'
-                conn.send(http_header.encode('utf-8'))
-            reply= self.app(environ, start_response)+ b'\r\n'
-            conn.send(reply)
+    def handle_requst(self, conn, addr):
+        self.conn = conn
+        while self.status:
+            data = conn.recv(1024)
+            if not data:
+                break
+            self.environ = environ = self.make_env(data)
+            environ['REMOTE_HOST'] = addr
+            reply = self.app(self.environ, self.start_response)
+            conn.send(reply.encode('utf-8'))
+            conn.send(b'\r\n')
             conn.close()
             break
 
@@ -57,16 +61,15 @@ class mycgi:
             environ['data'] = p
         return environ
 
-
     def stop(self):
         self.status = False
         self.sock.close()
 
 
 def hello(environ, start_response):
-    #print(environ)
+    print(environ)
     start_response("200 OK", [('Content-Type', 'text/html')])
-    # time.sleep(2)
+    #time.sleep(2)
     return b'hello cgi'
 
 
